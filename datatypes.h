@@ -120,6 +120,8 @@ typedef enum {
 	FOC_CC_DECOUPLING_CROSS_BEMF
 } mc_foc_cc_decoupling_mode;
 
+
+//NOTE-mm-learn
 typedef enum {
 	FOC_OBSERVER_ORTEGA_ORIGINAL = 0,
 	FOC_OBSERVER_MXLEMMING,

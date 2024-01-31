@@ -708,6 +708,8 @@ void mcpwm_foc_set_duty(float dutyCycle) {
  * @param dutyCycle
  * The duty cycle to use.
  */
+
+//NOTE- todo - add dutycycle 
 void mcpwm_foc_set_duty_noramp(float dutyCycle) {
 	// TODO: Actually do this without ramping
 	mcpwm_foc_set_duty(dutyCycle);
@@ -1709,6 +1711,7 @@ int mcpwm_foc_encoder_detect(float current, bool print, float *offset, float *ra
  * @return
  * The fault code.
  */
+//TODO-mm- MOVE --measure_resistance
 int mcpwm_foc_measure_resistance(float current, int samples, bool stop_after, float *resistance) {
 	mc_interface_lock();
 
@@ -1821,6 +1824,7 @@ int mcpwm_foc_measure_resistance(float current, int samples, bool stop_after, fl
  * @return
  * The fault code
  */
+//TODO-mm- MOVE --measure_inductance_BYvoltage
 int mcpwm_foc_measure_inductance(float duty, int samples, float *curr, float *ld_lq_diff, float *inductance) {
 	volatile motor_all_state_t *motor = get_motor_now();
 	int fault = FAULT_CODE_NONE;
@@ -1974,15 +1978,16 @@ int mcpwm_foc_measure_inductance(float duty, int samples, float *curr, float *ld
  * @param samples
  * The number of samples to average over.
  *
- * @param *curr
+ * @param curr
  * The current that was used for this measurement.
  *
- * @inductance
+ * @inductance  @param ld_lq_diff, @param inductance
  * The average d and q axis inductance in uH.
  *
  * @return
  * The fault code
  */
+//TODO-mm-MOVE --measure_inductance_BYcurrent
 int mcpwm_foc_measure_inductance_current(float curr_goal, int samples, float *curr, float *ld_lq_diff, float *inductance) {
 	int fault = FAULT_CODE_NONE;
 	float duty_last = 0.0;
@@ -2274,6 +2279,7 @@ int mcpwm_foc_hall_detect(float current, uint8_t *hall_table, bool *result) {
  * 1: Success
  *
  */
+//TODO -mm-add ADC calibrate
 int mcpwm_foc_dc_cal(bool cal_undriven) {
 	// Wait max 5 seconds for DRV-fault to go away
 	int cnt = 0;
@@ -2405,6 +2411,7 @@ int mcpwm_foc_dc_cal(bool cal_undriven) {
 	voltage_sum[0] /= samples;
 	voltage_sum[1] /= samples;
 	voltage_sum[2] /= samples;
+	
 	float v_avg = (voltage_sum[0] + voltage_sum[1] + voltage_sum[2]) / 3.0;
 
 	m_motor_1.m_conf->foc_offsets_voltage[0] = voltage_sum[0] - v_avg;
@@ -3905,6 +3912,7 @@ static THD_FUNCTION(pid_thread, arg) {
  * @param dt
  * The time step in seconds.
  */
+//NOTE -read again
 static void control_current(motor_all_state_t *motor, float dt) {
 	volatile motor_state_t *state_m = &motor->m_motor_state;
 	volatile mc_configuration *conf_now = motor->m_conf;
@@ -3971,6 +3979,7 @@ static void control_current(motor_all_state_t *motor, float dt) {
 		ki = motor->m_current_ki_temp_comp;
 	}
 
+	//NOTE-mm= d_gain_scale
 	state_m->vd_int += Ierr_d * (ki * d_gain_scale * dt);
 	state_m->vq_int += Ierr_q * (ki * dt);
 
@@ -4014,6 +4023,7 @@ static void control_current(motor_all_state_t *motor, float dt) {
 
 	// Calculate the max length of the voltage space vector without overmodulation.
 	// Is simply 1/sqrt(3) * v_bus. See https://microchipdeveloper.com/mct5001:start. Adds margin with max_duty.
+	//TOD0-mm-add-max_duty
 	float max_v_mag = ONE_BY_SQRT3 * max_duty * state_m->v_bus;
 
 	// Saturation and anti-windup. Notice that the d-axis has priority as it controls field
